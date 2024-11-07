@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setProducts, removeProduct } from '../redux/productSlice';
+import { setProducts, removeProduct, deleteProduct } from '../redux/productSlice';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { deleteProductFromDb, fetchProductsFromDb } from '../database/db'; // Custom fetch function
@@ -39,7 +39,7 @@ const ListScreen = () => {
         onPress: () => {
           // Remove product from Redux state
           dispatch(removeProduct(id));
-          deleteProductFromDb(id)
+          deleteProduct(id)
           
           // Optionally, re-fetch the products if necessary
           fetchProductsFromDb()
