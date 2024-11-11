@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setProducts, removeProduct, deleteProduct } from '../redux/productSlice';
+import { setProducts, removeProduct } from '../redux/productSlice';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { deleteProductFromDb, fetchProductsFromDb } from '../database/db'; // Custom fetch function
@@ -39,14 +39,16 @@ const ListScreen = () => {
         onPress: () => {
           // Remove product from Redux state
           dispatch(removeProduct(id));
-          deleteProduct(id)
-          
-          // Optionally, re-fetch the products if necessary
-          fetchProductsFromDb()
-            .then(fetchedProducts => {
-              dispatch(setProducts(fetchedProducts)); // Re-fetch products after deletion
+          deleteProductFromDb(id)
+            .then(() => {
+              // Optionally, re-fetch the products if necessary
+              fetchProductsFromDb()
+                .then(fetchedProducts => {
+                  dispatch(setProducts(fetchedProducts)); // Re-fetch products after deletion
+                })
+                .catch(error => console.log('Error fetching products after deletion:', error));
             })
-            .catch(error => console.log('Error fetching products after deletion:', error));
+            .catch(error => console.log('Error deleting product from database:', error));
         },
       },
     ]);
@@ -58,15 +60,15 @@ const ListScreen = () => {
 
   return (
     <View style={styles.container}>
-      <AppBar title={"List Screen"}/>
+      <AppBar title={"List Screen"} />
       {products.length === 0 ? (
         <Text style={styles.noDataText}>No data found</Text>
       ) : (
         <FlatList
-        style={{marginHorizontal:10,marginVertical:10}}
+          style={{ marginHorizontal: 10, marginVertical: 10 }}
           data={products}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item,index}) => (
+          renderItem={({ item }) => (
             <View style={styles.card}>
               <View style={styles.cardContent}>
                 <Text style={styles.productName}>{item.name}</Text>
@@ -75,7 +77,7 @@ const ListScreen = () => {
               </View>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={() => handleDelete(index)} // Handle delete
+                onPress={() => handleDelete(item.id)} // Use item.id for deletion
               >
                 <Ionicons name="trash-outline" size={24} color="white" />
               </TouchableOpacity>
@@ -91,7 +93,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f4f4',
-    
   },
   card: {
     backgroundColor: 'white',

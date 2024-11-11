@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Modal,
+  Alert,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import QRScanner from "../components/QrScanner";
@@ -17,6 +18,7 @@ import AppBar from "../components/Appbar";
 
 const dWidth = Dimensions.get("window").width;
 const clr1 = "mediumseagreen";
+const TARGET_QR_CODE = "https://qr-codes.io/qX1RzJ";
 
 const ScanQRPage = () => {
   const dispatch = useDispatch();
@@ -28,11 +30,24 @@ const ScanQRPage = () => {
     setShowQR(true);
   };
 
-  const onQrRead = (qrtext) => {
-    dispatch(setQrCode(qrtext));  // Save scanned QR data to Redux
-    setShowQR(false);
-    navigation.navigate("Scanner")
-  };
+ 
+
+ const onQrRead = (qrtext: string | null) => {
+  if (qrtext === TARGET_QR_CODE) {
+    dispatch(setQrCode(qrtext));
+    navigation.navigate("Scanner"); // Replace with your desired screen name
+  } else {
+    // Show alert and only close the scanner modal after dismissing the alert
+    Alert.alert("Invalid QR code", "Please scan the correct code.", [
+      {
+        text: "OK",
+        onPress: () => {
+          setShowQR(false); // Close scanner after alert is dismissed
+        },
+      },
+    ]);
+  }
+};
 
   useEffect(()=>{
     createTable()

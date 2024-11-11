@@ -28,7 +28,7 @@ const ScannerData = () => {
       Alert.alert("Product inserted successfully", "", [
         {
           text: "OK",
-          onPress: () => navigation.goBack(), // Navigate back when user presses "OK"
+          onPress: () => navigation.navigate("Initial"), // Navigate back when user presses "OK"
         },
       ]);
     } catch (error) {
