@@ -55,11 +55,11 @@ const ScanQRPage = () => {
 
   return (
     <View style={styles.page}>
-      {qrCode ? (
+      {/* {qrCode ? (
         <Text style={{ fontSize: 16, color: "black" }}>
           {"QR Value \n" + qrCode}
         </Text>
-      ) : null}
+      ) : null} */}
       <Ionicons
         name={"scan-circle-outline"}
         size={qrCode ? dWidth * 0.4 : dWidth * 0.75}
@@ -69,9 +69,9 @@ const ScanQRPage = () => {
         <Text style={{ color: clr1 }}>Scan QR</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("List")} style={styles.btn}>
+      {/* <TouchableOpacity onPress={() => navigation.navigate("List")} style={styles.btn}>
         <Text style={{ color: clr1 }}>View List</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* Modal for QR Scanner */}
       <Modal

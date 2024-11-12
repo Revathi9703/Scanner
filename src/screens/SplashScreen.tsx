@@ -16,7 +16,7 @@ const SplashScreen = ({  }) => {
 
    
     setTimeout(() => {
-      navigation.navigate("Initial");
+      navigation.replace('MainTabs');
     }, 3000); 
   }, []);
 

@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setProducts, removeProduct } from '../redux/productSlice';
+import { setProducts, removeProduct, updateProductQuantity } from '../redux/productSlice';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { deleteProductFromDb, fetchProductsFromDb } from '../database/db'; // Custom fetch function
-import { useNavigation } from '@react-navigation/native'; // Import navigation if needed
+import { deleteProductFromDb, fetchProductsFromDb } from '../database/db';
 import AppBar from '../components/Appbar';
 
 const ListScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation(); // Use navigation hook
   const products = useSelector(state => state.product.items);
-  const [loading, setLoading] = useState(false); // Loading state to handle fetching
+  const [loading, setLoading] = useState(false);
 
   // Fetch products from DB when the component mounts
   useEffect(() => {
@@ -37,22 +35,33 @@ const ListScreen = () => {
       {
         text: 'Delete',
         onPress: () => {
-          // Remove product from Redux state
           dispatch(removeProduct(id));
           deleteProductFromDb(id)
-            .then(() => {
-              // Optionally, re-fetch the products if necessary
-              fetchProductsFromDb()
-                .then(fetchedProducts => {
-                  dispatch(setProducts(fetchedProducts)); // Re-fetch products after deletion
-                })
-                .catch(error => console.log('Error fetching products after deletion:', error));
-            })
+            .then(() => fetchProductsFromDb().then(fetchedProducts => dispatch(setProducts(fetchedProducts))))
             .catch(error => console.log('Error deleting product from database:', error));
         },
       },
     ]);
   };
+
+  // Handle quantity increase
+  const handleIncreaseQuantity = (id) => {
+    const product = products.find(item => item.id === id);
+    if (product) {
+      dispatch(updateProductQuantity({ id, quantity: product.quantity + 1 })); // Updated to use quantity
+    }
+  };
+
+  // Handle quantity decrease
+  const handleDecreaseQuantity = (id) => {
+    const product = products.find(item => item.id === id);
+    if (product && product.quantity > 1) { // prevent going below 1
+      dispatch(updateProductQuantity({ id, quantity: product.quantity - 1 })); // Updated to use quantity
+    }
+  };
+
+  // Calculate total amount
+  const totalAmount = products.reduce((sum, item) => sum + item.mrp * item.quantity, 0); // Updated to use quantity
 
   if (loading) {
     return <Text style={styles.loadingText}>Loading...</Text>;
@@ -72,12 +81,20 @@ const ListScreen = () => {
             <View style={styles.card}>
               <View style={styles.cardContent}>
                 <Text style={styles.productName}>{item.name}</Text>
-                <Text style={styles.productDetail}>MRP: ${item.mrp.toFixed(2)}</Text>
-                <Text style={styles.productDetail}>Quantity: {item.amount}</Text>
+                <Text style={styles.productDetail}>MRP: ₹ {item.mrp.toFixed(2)}</Text>
+                <View style={styles.quantityContainer}>
+                  <TouchableOpacity onPress={() => handleDecreaseQuantity(item.id)} style={styles.quantityButton}>
+                    <Ionicons name="remove-circle-outline" size={20} color="red" />
+                  </TouchableOpacity>
+                  <Text style={styles.quantityText}>{item.amount}</Text> 
+                  <TouchableOpacity onPress={() => handleIncreaseQuantity(item.id)} style={styles.quantityButton}>
+                    <Ionicons name="add-circle-outline" size={20} color="green" />
+                  </TouchableOpacity>
+                </View>
               </View>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={() => handleDelete(item.id)} // Use item.id for deletion
+                onPress={() => handleDelete(item.id)}
               >
                 <Ionicons name="trash-outline" size={24} color="white" />
               </TouchableOpacity>
@@ -85,6 +102,10 @@ const ListScreen = () => {
           )}
         />
       )}
+      {/* Total Amount Section */}
+      <View style={styles.totalContainer}>
+        <Text style={styles.totalText}>Total: ₹ {totalAmount.toFixed(2)}</Text>
+      </View>
     </View>
   );
 };
@@ -121,6 +142,17 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 3,
   },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quantityText: {
+    fontSize: 16,
+    marginHorizontal: 8,
+  },
+  quantityButton: {
+    paddingHorizontal: 5,
+  },
   deleteButton: {
     backgroundColor: '#e74c3c',
     padding: 10,
@@ -139,6 +171,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 18,
     color: '#555',
+  },
+  totalContainer: {
+    padding: 15,
+    backgroundColor: '#333',
+    alignItems: 'center',
+  },
+  totalText: {
+    fontSize: 20,
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

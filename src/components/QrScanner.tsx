@@ -7,15 +7,19 @@ import {
 } from "react-native-vision-camera";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-const QRScanner = ({ onRead }: { onRead: (value: string | null) => void }) => {
+const QRScanner = ({ onRead }) => {
   const [hasPermission, setHasPermission] = useState(false);
+  const [scanned, setScanned] = useState(false); // New state to track if QR has been scanned
   const device = useCameraDevice("back");
 
   const codeScanner = useCodeScanner({
     codeTypes: ["qr"],
     onCodeScanned: (codes) => {
-      console.log("Scanned QR code value:", codes[0].value);
-      onRead(codes[0].value);
+      if (!scanned) {
+        console.log("Scanned QR code value:", codes[0].value);
+        setScanned(true); // Prevent further scans
+        onRead(codes[0].value); // Perform the action with the scanned code
+      }
     },
   });
 
@@ -27,6 +31,11 @@ const QRScanner = ({ onRead }: { onRead: (value: string | null) => void }) => {
 
     requestCameraPermission();
   }, []);
+
+  const handleClose = () => {
+    setScanned(false); // Reset scanned state if closed
+    onRead(null); // Optionally perform any additional actions on close
+  };
 
   if (!device || !hasPermission) {
     return (
@@ -46,13 +55,8 @@ const QRScanner = ({ onRead }: { onRead: (value: string | null) => void }) => {
         device={device}
         isActive={true}
       />
-      {/* <View style={styles.header}>
-        <TouchableOpacity onPress={() => onRead(null)}>
-          <Ionicons name="arrow-back-outline" size={25} color="white" />
-        </TouchableOpacity>
-      </View> */}
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => onRead(null)} style={styles.closeButton}>
+        <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
           <Text style={styles.closeText}>Close</Text>
         </TouchableOpacity>
       </View>
@@ -69,15 +73,6 @@ const styles = StyleSheet.create({
   permissionText: {
     backgroundColor: "white",
     padding: 10,
-  },
-  header: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    padding: 10,
-    backgroundColor: "#00000090",
-    alignItems: "flex-start",
   },
   footer: {
     position: "absolute",

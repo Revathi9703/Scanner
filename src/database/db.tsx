@@ -4,10 +4,10 @@ import SQLite from 'react-native-sqlite-storage';
 const db = SQLite.openDatabase({ name: 'Productname.db', location: 'default' });
 
 // Function to create the table
-export const createTable = () => {
-  db.transaction(tx => {
+export const createTable = async () => {
+  (await db).transaction(tx => {
     tx.executeSql(
-      'CREATE TABLE IF NOT EXISTS Product (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, mrp REAL, amount REAL);',
+      'CREATE TABLE IF NOT EXISTS Product (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, mrp REAL, quantity INTEGER);',
       [],
       () => console.log('Table created successfully'),
       (error) => console.log('Error creating table:', error)
@@ -16,12 +16,12 @@ export const createTable = () => {
 };
 
 // Function to insert product into the database
-export const insertProductToDb = (name, mrp, amount) => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
+export const insertProductToDb = (name, mrp, quantity) => {
+  return new Promise(async (resolve, reject) => {
+    (await db).transaction((tx) => {
       tx.executeSql(
-        'INSERT INTO Product (name, mrp, amount) VALUES (?, ?, ?);',
-        [name, mrp, amount],
+        'INSERT INTO Product (name, mrp, quantity) VALUES (?, ?, ?);',
+        [name, mrp, quantity],
         (tx, result) => {
           resolve(result); // Resolve promise if insertion is successful
         },
@@ -35,8 +35,8 @@ export const insertProductToDb = (name, mrp, amount) => {
 
 // Function to fetch products from the database
 export const fetchProductsFromDb = () => {
-  return new Promise((resolve, reject) => {
-    db.transaction(tx => {
+  return new Promise(async (resolve, reject) => {
+    (await db).transaction(tx => {
       tx.executeSql(
         'SELECT * FROM Product;',
         [],
@@ -45,11 +45,7 @@ export const fetchProductsFromDb = () => {
           for (let i = 0; i < rows.length; i++) {
             products.push(rows.item(i));
           }
-          if (products.length > 0) {
-            resolve(products); // Return the products if found
-          } else {
-            resolve([]); // Return an empty array if no products are found
-          }
+          resolve(products); // Resolve with the products array
         },
         (error) => {
           reject(error); // Reject promise if there's an error
@@ -76,4 +72,3 @@ export const deleteProductFromDb = (id) => {
     });
   });
 };
-
