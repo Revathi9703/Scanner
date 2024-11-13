@@ -1,7 +1,7 @@
 import SQLite from 'react-native-sqlite-storage';
 
 // Open the database
-const db = SQLite.openDatabase({ name: 'Productname.db', location: 'default' });
+const db = SQLite.openDatabase({ name: 'ProductData.db', location: 'default' });
 
 // Function to create the table
 export const createTable = async () => {

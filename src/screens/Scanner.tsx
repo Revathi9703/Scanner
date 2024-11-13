@@ -28,13 +28,21 @@ const ScannerData = () => {
       Alert.alert("Product inserted successfully", "", [
         {
           text: "OK",
-          onPress: () => navigation.navigate("MainTabs"), // Navigate back when user presses "OK"
+          onPress: () => {navigation.push("MainTabs");
+            clearData();
+          } // Navigate back when user presses "OK"
         },
       ]);
     } catch (error) {
       Alert.alert("Error inserting product", error.message);
     }
   };
+
+  const clearData = () =>{
+  setName('');
+  setMRP('');
+  setAmount('')
+  }
 
   return (
     <View style={styles.container}>

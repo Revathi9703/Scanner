@@ -86,7 +86,7 @@ const ListScreen = () => {
                   <TouchableOpacity onPress={() => handleDecreaseQuantity(item.id)} style={styles.quantityButton}>
                     <Ionicons name="remove-circle-outline" size={20} color="red" />
                   </TouchableOpacity>
-                  <Text style={styles.quantityText}>{item.amount}</Text> 
+                  <Text style={styles.quantityText}>{item.quantity}</Text> 
                   <TouchableOpacity onPress={() => handleIncreaseQuantity(item.id)} style={styles.quantityButton}>
                     <Ionicons name="add-circle-outline" size={20} color="green" />
                   </TouchableOpacity>
@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   quantityText: {
     fontSize: 16,
     marginHorizontal: 8,
+    color:"black"
   },
   quantityButton: {
     paddingHorizontal: 5,
@@ -174,12 +175,12 @@ const styles = StyleSheet.create({
   },
   totalContainer: {
     padding: 15,
-    backgroundColor: '#333',
+    backgroundColor: '#ffb6c1',
     alignItems: 'center',
   },
   totalText: {
     fontSize: 20,
-    color: 'white',
+    color: 'black',
     fontWeight: 'bold',
   },
 });

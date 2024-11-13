@@ -50,7 +50,8 @@ const ScanQRPage = () => {
 };
 
   useEffect(()=>{
-    createTable()
+    createTable();
+    setShowQR(false); 
   },[]);
 
   return (
